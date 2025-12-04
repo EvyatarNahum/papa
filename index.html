@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חידות ההיגיון של סבא - יומולדת 60</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1.4em;
+            opacity: 0.95;
+        }
+        
+        .timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 2.5em;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .puzzles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .puzzle-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            border: 4px solid transparent;
+        }
+        
+        .puzzle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        .puzzle-card.solved {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+        
+        .puzzle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #e5e7eb;
+        }
+        
+        .puzzle-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #7e22ce;
+        }
+        
+        .puzzle-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #1f2937;
+            flex: 1;
+            margin: 0 20px;
+        }
+        
+        .difficulty {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .difficulty.hard {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .difficulty.expert {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .puzzle-content {
+            font-size: 1.15em;
+            line-height: 1.9;
+            color: #374151;
+            margin-bottom: 25px;
+            min-height: 200px;
+        }
+        
+        .puzzle-content p {
+            margin-bottom: 15px;
+        }
+        
+        .puzzle-content strong {
+            color: #7e22ce;
+            font-weight: 600;
+        }
+        
+        .puzzle-content .highlight {
+            background: #fef3c7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        
+        .table-logic {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1em;
+        }
+        
+        .table-logic th,
+        .table-logic td {
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            text-align: center;
+        }
+        
+        .table-logic th {
+            background: #7e22ce;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .table-logic tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        .answer-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .answer-label {
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 3px solid #d1d5db;
+            border-radius: 10px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: #7e22ce;
+            box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .submit-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #7e22ce, #6b21a8);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #6b21a8, #581c87);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(126, 34, 206, 0.4);
+        }
+        
+        .hint-btn {
+            padding: 15px 25px;
+            font-size: 1.1em;
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .hint-btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            animation: slideDown 0.3s;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .feedback.show {
+            display: block;
+        }
+        
+        .feedback.correct {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        
+        .feedback.wrong {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+        
+        .hint-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            color: #92400e;
+            display: none;
+        }
+        
+        .hint-box.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+        
+        .progress-indicator {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .progress-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+        
+        .progress-bar-container {
+            background: #e5e7eb;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #10b981, #059669);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .final-reveal {
+            display: none;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .final-reveal.show {
+            display: block;
+            animation: zoomIn 0.6s;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .final-reveal h2 {
+            font-size: 3.5em;
+            color: #7e22ce;
+            margin-bottom: 25px;
+        }
+        
+        .final-message {
+            font-size: 1.8em;
+            line-height: 1.8;
+            color: #374151;
+            margin: 30px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 15px;
+            border: 3px solid #f59e0b;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            padding: 25px;
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            border-radius: 15px;
+            border: 3px solid #7e22ce;
+        }
+        
+        .stat-label {
+            font-size: 1.1em;
+            color: #6b21a8;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #7e22ce;
+        }
+        
+        .emoji-large {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">10:00</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🧩 חידות ההיגיון של סבא 🧩</h1>
+            <div class="subtitle">4 חידות מאתגרות ליום הולדת 60 • דדוקציה • לוגיקה • חשיבה יצירתית</div>
+        </div>
+        
+        <div class="progress-indicator">
+            <div class="progress-title">התקדמות: <span id="solvedCount">0</span>/4 חידות נפתרו</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+        </div>
+        
+        <div class="puzzles-grid">
+            <!-- Puzzle 1: השקרן והאמתי -->
+            <div class="puzzle-card" id="card1">
+                <div class="puzzle-header">
+                    <div class="puzzle-number">🎯 1</div>
+                    <div class="puzzle-title">השקרן והאמתי</div>
+                    <div class="difficulty hard">מאתגר</div>
+                </div>
+                
+                <div class="puzzle-content">
+                    <p><strong>בארוחת יום ההולדת יש 3 אורחים:</strong></p>
+                    <p>🔵 <strong>דני</strong> - תמיד אומר אמת<br>
+                    🔴 <strong>רוני</strong> - תמיד משקר<br>
+                    🟡 <strong>טוני</strong> - לפעמים אמת, לפעמים שקר</p>
+                    
+                    <p style="margin-top: 20px;"><strong>הם אמרו:</strong></p>
+                    <p>👤 אחד אמר: "אני דני"<br>
+                    👤 השני אמר: "אני לא דני"<br>
+                    👤 השלישי אמר: "אני לא רוני"</p>
+                    
+                    <p style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px;">
+                        <strong>שאלה:</strong> מי הוא מי? (רשמו בסדר: ראשון, שני, שלישי)
+                    </p>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-label">התשובה שלכם (לדוגמה: רוני, דני, טוני):</div>
+                    <input type="text" class="answer-input" id="answer1" placeholder="הקלידו את התשובה...">
+                    <div class="button-group">
+                        <button class="submit-btn" onclick="checkAnswer(1)">בדוק תשובה</button>
+                        <button class="hint-btn" onclick="toggleHint(1)">💡 רמז</button>
+                    </div>
+                    <div class="hint-box" id="hint1">
+                        <strong>רמז:</strong> דני תמיד אומר אמת, אז אם מישהו אומר "אני דני" - האם זה יכול להיות רוני (שמשקר)? חשבו מי יכול לומר את כל משפט...
+                    </div>
+                    <div class="feedback" id="feedback1"></div>
+                </div>
+            </div>
+            
+            <!-- Puzzle 2: חידת המשקלות -->
+            <div class="puzzle-card" id="card2">
+                <div class="puzzle-header">
+                    <div class="puzzle-number">⚖️ 2</div>
+                    <div class="puzzle-title">חידת המשקלות</div>
+                    <div class="difficulty hard">מאתגר</div>
+                </div>
+                
+                <div class="puzzle-content">
+                    <p><strong>יש לכם 12 כדורים זהים למראה.</strong></p>
+                    <p>11 כדורים שוקלים אותו משקל בדיוק, וכדור אחד <span class="highlight">שונה</span> במשקל (לא יודעים אם כבד יותר או קל יותר).</p>
+                    
+                    <p style="margin-top: 20px;"><strong>יש לכם מאזניים (ללא מדידת משקל) שיכולים להשוות בין 2 קבוצות כדורים.</strong></p>
+                    
+                    <p style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px;">
+                        <strong>שאלה:</strong> מה המספר המינימלי של שקילות שנדרשות כדי למצוא בוודאות איזה כדור שונה?
+                    </p>
+                    
+                    <p style="margin-top: 15px; font-size: 0.95em; color: #6b7280;">
+                        💡 זו חידה קלאסית שדורשת חשיבה אלגוריתמית
+                    </p>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-label">מספר השקילות המינימלי:</div>
+                    <input type="text" class="answer-input" id="answer2" placeholder="רק מספר...">
+                    <div class="button-group">
+                        <button class="submit-btn" onclick="checkAnswer(2)">בדוק תשובה</button>
+                        <button class="hint-btn" onclick="toggleHint(2)">💡 רמז</button>
+                    </div>
+                    <div class="hint-box" id="hint2">
+                        <strong>רמז:</strong> חשבו על חלוקה ל-3 קבוצות של 4. אם בשקילה ראשונה מאזניים מאוזנים - הכדור השונה בקבוצה שלא נשקלה...
+                    </div>
+                    <div class="feedback" id="feedback2"></div>
+                </div>
+            </div>
+            
+            <!-- Puzzle 3: רצף המספרים -->
+            <div class="puzzle-card" id="card3">
+                <div class="puzzle-header">
+                    <div class="puzzle-number">🔢 3</div>
+                    <div class="puzzle-title">הרצף המסתורי</div>
+                    <div class="difficulty expert">מומחה</div>
+                </div>
+                
+                <div class="puzzle-content">
+                    <p><strong>התבוננו ברצף המספרים הבא:</strong></p>
+                    
+                    <div style="text-align: center; font-size: 1.8em; margin: 30px 0; padding: 25px; background: #f3f4f6; border-radius: 10px; font-weight: bold; color: #7e22ce;">
+                        2, 3, 5, 9, 17, 33, ?
+                    </div>
+                    
+                    <p><strong>מה המספר הבא ברצף?</strong></p>
+                    
+                    <p style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px; font-size: 0.95em;">
+                        💡 הרמז: זה לא פיבונאצ'י, ולא מספרים ראשוניים פשוטים. חשבו על הקשר בין מספר למספר הבא...
+                    </p>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-label">המספר הבא ברצף:</div>
+                    <input type="text" class="answer-input" id="answer3" placeholder="??">
+                    <div class="button-group">
+                        <button class="submit-btn" onclick="checkAnswer(3)">בדוק תשובה</button>
+                        <button class="hint-btn" onclick="toggleHint(3)">💡 רמז</button>
+                    </div>
+                    <div class="hint-box" id="hint3">
+                        <strong>רמז:</strong> כל מספר = (המספר הקודם × 2) - 1<br>
+                        לדוגמה: 2×2-1=3, 3×2-1=5, 5×2-1=9...
+                    </div>
+                    <div class="feedback" id="feedback3"></div>
+                </div>
+            </div>
+            
+            <!-- Puzzle 4: חידת הגיל -->
+            <div class="puzzle-card" id="card4">
+                <div class="puzzle-header">
+                    <div class="puzzle-number">🎂 4</div>
+                    <div class="puzzle-title">חידת הגילאים</div>
+                    <div class="difficulty expert">מומחה</div>
+                </div>
+                
+                <div class="puzzle-content">
+                    <p><strong>סבא ושלושת ילדיו:</strong></p>
+                    
+                    <p>📍 מכפלת הגילאים של 3 הילדים = 60<br>
+                    📍 סכום הגילאים של 3 הילדים = מספר הבית של סבא<br>
+                    📍 הילד הבכור (הכי מבוגר) אוהב לנגן בפסנתר</p>
+                    
+                    <p style="margin-top: 20px;"><strong>התגלה:</strong> אפילו אחרי שנאמר לכם מספר הבית, עדיין אין לכם מספיק מידע! (זה בעצמו רמז חשוב)</p>
+                    
+                    <p style="margin-top: 20px; background: #fef3c7; padding: 15px; border-radius: 8px;">
+                        <strong>שאלה:</strong> מה הגילאים של 3 הילדים? (רשמו מהצעיר לבוגר, עם פסיקים)
+                    </p>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-label">הגילאים (מהצעיר לבוגר, לדוגמה: 2, 5, 6):</div>
+                    <input type="text" class="answer-input" id="answer4" placeholder="?, ?, ?">
+                    <div class="button-group">
+                        <button class="submit-btn" onclick="checkAnswer(4)">בדוק תשובה</button>
+                        <button class="hint-btn" onclick="toggleHint(4)">💡 רמז</button>
+                    </div>
+                    <div class="hint-box" id="hint4">
+                        <strong>רמז:</strong> מצאו את כל האפשרויות למכפלה של 60. ההערה ש"אין מספיק מידע" אומרת שיש 2+ אפשרויות עם אותו סכום! המידע על "בכור" פותר את הבעיה...
+                    </div>
+                    <div class="feedback" id="feedback4"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="final-reveal" id="finalReveal">
+            <div class="emoji-large">🎉🧠🎂</div>
+            <h2>פצחתם את כל החידות!</h2>
+            
+            <div class="final-message">
+                <strong>60 שנים של חוכמה, היגיון ותבונה</strong><br>
+                סבא - המנטור שלנו בחיים ובחשיבה<br>
+                מזל טוב על 60 שנות חדות מחשבתית!
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">⏱️ זמן סיום</div>
+                    <div class="stat-value" id="finalTime">--:--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 חידות נפתרו</div>
+                    <div class="stat-value">4/4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🧠 IQ קבוצתי</div>
+                    <div class="stat-value">∞</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let startTime = Date.now();
+        let solvedPuzzles = new Set();
+        let timerInterval;
+        
+        // Solutions
+        const solutions = {
+            1: ['רוני, טוני, דני', 'רוני,טוני,דני', 'רוני טוני דני'],
+            2: ['3'],
+            3: ['65'],
+            4: ['2, 2, 15', '2,2,15', '2, 15, 2', '2,15,2', '15, 2, 2', '15,2,2']
+        };
+        
+        // Timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = 600 - elapsed;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').textContent = '00:00';
+                    document.getElementById('timer').style.background = 'linear-gradient(135deg, #7f1d1d, #991b1b)';
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                document.getElementById('timer').textContent = 
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                if (remaining <= 120) {
+                    document.getElementById('timer').style.background = 'linear-gradient(135deg, #ea580c, #c2410c)';
+                }
+            }, 1000);
+        }
+        
+        startTimer();
+        
+        function checkAnswer(puzzleNum) {
+            const input = document.getElementById(`answer${puzzleNum}`).value.trim();
+            const feedback = document.getElementById(`feedback${puzzleNum}`);
+            
+            const isCorrect = solutions[puzzleNum].some(sol => 
+                input.toLowerCase().replace(/\s+/g, ' ') === sol.toLowerCase().replace(/\s+/g, ' ')
+            );
+            
+            if (isCorrect && !solvedPuzzles.has(puzzleNum)) {
+                solvedPuzzles.add(puzzleNum);
+                feedback.className = 'feedback correct show';
+                feedback.textContent = '✅ מצוין! התשובה נכונה!';
+                
+                document.getElementById(`card${puzzleNum}`).classList.add('solved');
+                document.getElementById(`answer${puzzleNum}`).disabled = true;
+                
+                updateProgress();
+                
+                if (solvedPuzzles.size === 4) {
+                    setTimeout(() => showFinalReveal(), 1500);
+                }
+            } else if (solvedPuzzles.has(puzzleNum)) {
+                feedback.className = 'feedback correct show';
+                feedback.textContent = '✅ כבר פתרתם את החידה הזו!';
+            } else {
+                feedback.className = 'feedback wrong show';
+                feedback.textContent = '❌ לא מדויק... נסו שוב או השתמשו ברמז!';
+            }
+        }
+        
+        function toggleHint(puzzleNum) {
+            const hint = document.getElementById(`hint${puzzleNum}`);
+            hint.classList.toggle('show');
+        }
+        
+        function updateProgress() {
+            const count = solvedPuzzles.size;
+            const percentage = (count / 4) * 100;
+            
+            document.getElementById('solvedCount').textContent = count;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressBar').textContent = Math.round(percentage) + '%';
+        }
+        
+        function showFinalReveal() {
+            clearInterval(timerInterval);
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('finalTime').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            document.querySelector('.puzzles-grid').style.display = 'none';
+            document.querySelector('.progress-indicator').style.display = 'none';
+            document.getElementById('finalReveal').classList.add('show');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
